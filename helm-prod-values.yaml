@@ -1,0 +1,68 @@
+common:
+  nameOverride: fastcampus-app
+  fullnameOverride: fastcampus-app
+
+serviceAccount:
+  create: true
+
+workload:
+  kind: Deployment
+  replicaCount: 1
+  image:
+    ecr:
+      enabled: true
+      repository: fastcampus-app-image
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  containerPort: 8000
+  probes:
+    livenessProbe:
+      path: /lectures/
+      conditions:
+        initialDelaySeconds: 20
+        timeoutSeconds: 10
+        periodSeconds: 10
+        successThreshold: 1
+        failureThreshold: 3
+    readinessProbe:
+      path: /lectures/
+      conditions:
+        initialDelaySeconds: 20
+        timeoutSeconds: 10
+        periodSeconds: 10
+        successThreshold: 1
+        failureThreshold: 3
+  envFrom:
+    - secretRef:
+        name: fastcampus-app-secret
+
+secret:
+  name: fastcampus-app-secret
+  body:
+    key1: asdf
+    key2: fdsa
+
+autoscaling:
+  enabled: false
+
+service:
+  ports:
+    - port: 80
+      targetPort: 8000
+      protocol: TCP
+      name: http
+
+ingress:
+  enabled: true
+  annotations:
+    Kubernetes.io/ingress.class: nginx
+  hosts:
+    - host: fastcampus.uniglot.dev
+      paths:
+        - path: /
+          pathType: Prefix
