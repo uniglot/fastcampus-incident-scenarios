@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastcampus-case1-dev
+  labels:
+    app.kubernetes.io/name: fastcampus-case1-dev
+    app.kubernetes.io/instance: fastcampus-case1-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: fastcampus-case1-dev
+      app.kubernetes.io/instance: fastcampus-case1-dev
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: fastcampus-case1-dev
+        app.kubernetes.io/instance: fastcampus-case1-dev
+    spec:
+      serviceAccountName: fastcampus-case1-dev
+      containers:
+        - name: chart
+          image: "${ACCOUNT_ID}.dkr.ecr.ap-northeast-2.amazonaws.com/fastcampus-app-image:${IMAGE_TAG}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /lectures/
+              port: http
+            failureThreshold: 3
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /lectures/
+              port: http
+            failureThreshold: 3
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          env:
+            - name: DJANGO_SETTINGS
+              value: local

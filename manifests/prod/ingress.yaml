@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fastcampus-case1
+  labels:
+    app.kubernetes.io/name: fastcampus-case1
+    app.kubernetes.io/instance: fastcampus-case1-prod
+  annotations:
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    kubernetes.io/ingress.class: alb
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fastcampus-case1
+                port:
+                  number: 80
+      # host: fastcampus.uniglot.dev
