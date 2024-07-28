@@ -1,0 +1,50 @@
+name: Deploy
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: "true"
+
+      - name: Build and Push Container Image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_NAME: fastcampus-app-image
+        run: |
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          docker build -t $REGISTRY/$IMAGE_NAME:$SHA_SHORT .
+          docker push $REGISTRY/$IMAGE_NAME:$SHA_SHORT
+
+      - name: Create kube-config and install Helm
+        run: |
+          aws eks --region ap-northeast-2 update-kubeconfig --name fastcampus-infra-cluster
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - name: Install production Helm chart
+        env:
+          DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
+        run: |
+          helm upgrade --install fastcampus-prod chart \
+            -f helm-prod-values.yaml \
+            --set workload.image.tag="$(git rev-parse --short HEAD)" \
+            --set workload.databaseHost="${{ secrets.DATABASE_HOST }}" \
+            --set common.awsAccount="$(aws sts get-caller-identity --query Account --output text)"

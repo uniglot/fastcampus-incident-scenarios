@@ -15,10 +15,10 @@ workload:
   resources:
     requests:
       cpu: 100m
-      memory: 256Mi
+      memory: 128Mi
     limits:
-      cpu: 500m
-      memory: 512Mi
+      cpu: 200m
+      memory: 256Mi
   containerPort: 8000
   probes:
     livenessProbe:
@@ -37,20 +37,13 @@ workload:
         periodSeconds: 10
         successThreshold: 1
         failureThreshold: 3
-  envFrom:
-    - secretRef:
-        name: fastcampus-app-secret
-
-secret:
-  name: fastcampus-app-secret
-  body:
-    key1: asdf
-    key2: fdsa
+  deployStage: prod
 
 autoscaling:
   enabled: false
 
 service:
+  type: NodePort
   ports:
     - port: 80
       targetPort: 8000
@@ -59,10 +52,8 @@ service:
 
 ingress:
   enabled: true
-  annotations:
-    Kubernetes.io/ingress.class: nginx
+  className: alb
   hosts:
-    - host: fastcampus.uniglot.dev
-      paths:
+    - paths:
         - path: /
           pathType: Prefix

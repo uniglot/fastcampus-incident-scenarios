@@ -1,8 +1,10 @@
+import time
+
 from django.db import transaction
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from lectures.models import Lecture, Person
+from lectures.models import Department, Lecture, Person
 from lectures.serializers import LectureSerializer
 
 
@@ -14,9 +16,12 @@ class LectureView(APIView):
 
     def _filter(self):
         queryset = Lecture.objects.all()
+        start = time.time()
+        while time.time() - start < 0.05:
+            pass
         if department_code := self.request.query_params.get("department"):
             queryset = queryset.filter(professor__department__code=department_code)
-        return queryset
+        return queryset[:5]
 
 
 class LectureRegisterView(APIView):
