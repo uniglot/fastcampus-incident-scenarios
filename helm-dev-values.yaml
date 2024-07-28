@@ -1,13 +1,13 @@
 common:
-  nameOverride: fastcampus-app
-  fullnameOverride: fastcampus-app
+  nameOverride: fastcampus-app-dev
+  fullnameOverride: fastcampus-app-dev
 
 serviceAccount:
   create: true
 
 workload:
   kind: Deployment
-  replicaCount: 2
+  replicaCount: 1
   image:
     ecr:
       enabled: true
@@ -37,8 +37,7 @@ workload:
         periodSeconds: 10
         successThreshold: 1
         failureThreshold: 3
-  deployStage: prod
-  databaseHost: "fastcampus-infra-db-new.cumjq2hvxucn.ap-northeast-2.rds.amazonaws.com"
+  deployStage: dev
 
 autoscaling:
   enabled: false
@@ -58,4 +57,4 @@ ingress:
     - paths:
         - path: /
           pathType: Prefix
-      # host: fastcampus.uniglot.dev
+      # host: dev-fastcampus.uniglot.dev

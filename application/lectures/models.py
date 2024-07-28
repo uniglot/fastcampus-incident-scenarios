@@ -29,7 +29,7 @@ class Professor(models.Model):
 
 class Lecture(models.Model):
     name = models.CharField(max_length=32)
-    code = models.CharField(max_length=5)
+    code = models.CharField(max_length=20)
     professor = models.ForeignKey(Professor, on_delete=models.CASCADE)
     credit = models.IntegerField(default=3)
     register_limit = models.IntegerField()
