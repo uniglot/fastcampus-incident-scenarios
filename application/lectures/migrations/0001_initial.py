@@ -205,7 +205,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=32)),
-                ('code', models.CharField(max_length=5)),
+                ('code', models.CharField(max_length=20)),
                 ('credit', models.IntegerField(default=3)),
                 ('register_limit', models.IntegerField()),
                 ('professor', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='lectures.professor')),
