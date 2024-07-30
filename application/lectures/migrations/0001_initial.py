@@ -145,9 +145,9 @@ def create_initial_records(apps, schema_editor):
 
     professors = Professor.objects.all()
     lectures = []
-    prefixes = ["기본 ", "고급 ", "현대 ", "고대 ", "중세 ", "중급 ", "실무 ", "실용 "]
+    prefixes = ["기본", "고급", "현대", "고대", "중세", "중급", "실무", "실용", "전문", "최신"]
     topics = ["진", "케이틀린", "애쉬", "징크스", "럭스", "타릭", "녹턴", "벡스", "소나", "케넨"]
-    suffixes = ["의 이해", "의 역사", "학 개론", "학 입문", "의 응용"]
+    suffixes = ["의 이해", "의 역사", "학 개론", "학 입문", "의 응용", "의 탐구", "학 세미나", "의 인문학", "의 사회학", "의 물리학"]
 
     count = 0
     for prefix in prefixes:
@@ -155,7 +155,7 @@ def create_initial_records(apps, schema_editor):
             for suffix in suffixes:
                 lectures.append(
                     Lecture(
-                        name=prefix+topic+suffix,
+                        name=f"{prefix} {topic}{suffix}",
                         code=topic+str(count),
                         professor=professors[count%6],
                         register_limit=30,
@@ -205,7 +205,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=32)),
-                ('code', models.CharField(max_length=5)),
+                ('code', models.CharField(max_length=20)),
                 ('credit', models.IntegerField(default=3)),
                 ('register_limit', models.IntegerField()),
                 ('professor', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='lectures.professor')),

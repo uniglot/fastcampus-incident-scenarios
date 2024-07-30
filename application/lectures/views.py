@@ -1,22 +1,36 @@
+import time
+
 from django.db import transaction
+from django.db.models import Avg, Count, F, Sum
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from lectures.models import Lecture, Person
+from lectures.models import Department, Lecture, Person
 from lectures.serializers import LectureSerializer
 
 
 class LectureView(APIView):
-    def get(self, *args, **kwargs):
-        lectures = self._filter()
+    def get(self, request, *args, **kwargs):
+        lectures = self._filter()[:5]
         serializer = LectureSerializer(lectures, many=True)
         return Response(serializer.data)
 
     def _filter(self):
         queryset = Lecture.objects.all()
+
+        queryset = queryset.annotate(
+            student_count=Count('students'),
+            total_credits=Sum('students__total_credit'),
+            avg_credits=Avg('students__total_credit'),
+            department_name=F('professor__department__name'),
+            professor_name=F('professor__name'),
+            department_category=F('professor__department__category')
+        ).order_by('-student_count')
+
         if department_code := self.request.query_params.get("department"):
             queryset = queryset.filter(professor__department__code=department_code)
-        return queryset
+        
+        return list(queryset)
 
 
 class LectureRegisterView(APIView):
