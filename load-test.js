@@ -7,7 +7,7 @@ export let options = {
 };
 
 export default function () {
-    let res = http.get('http://localhost:8000/lectures/');
+    let res = http.get('http://k8s-default-fastcamp-527ad3a8da-1607718795.ap-northeast-2.elb.amazonaws.com/lectures/');
     check(res, {
         'status is 200': (r) => r.status === 200,
     });

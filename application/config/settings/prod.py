@@ -9,6 +9,6 @@ DATABASES = {
         "USER": "fastcampus",
         "PASSWORD": "supersecretpassword",
         "HOST": os.environ.get("DATABASE_HOST"),
-        "CONN_MAX_AGE": 0,
+        "CONN_MAX_AGE": 300,
     }
 }
