@@ -1,15 +1,15 @@
 import os
 
-DEBUG = False
-
 ALLOWED_HOSTS = ["*"]
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("DATABASE_NAME"),
-        "USER": os.environ.get("DATABASE_USER"),
-        "PASSWORD": os.environ.get("DATABASE_PASSWORD"),
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "sample",
+        "USER": "fastcampus",
+        "PASSWORD": "supersecretpassword",
         "HOST": os.environ.get("DATABASE_HOST"),
+        "PORT": "3306",
+        "CONN_MAX_AGE": 300,
     }
 }

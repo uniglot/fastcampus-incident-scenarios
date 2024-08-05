@@ -17,10 +17,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from lectures.views import LectureView, LectureRegisterView
+from lectures.views import (
+    DeleteLectureView,
+    LectureView,
+    LectureRegisterView,
+    RandomLectureRegisterView,
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('lectures/', LectureView.as_view()),
     path('lectures/register/', LectureRegisterView.as_view()),
+    path('lectures/random/', RandomLectureRegisterView.as_view()),
+    path('lectures/<int:lecture_id>/', DeleteLectureView.as_view()),
 ]

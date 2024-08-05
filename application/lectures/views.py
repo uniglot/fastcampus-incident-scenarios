@@ -1,4 +1,7 @@
+import random
+
 from django.db import transaction
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -7,15 +10,17 @@ from lectures.serializers import LectureSerializer
 
 
 class LectureView(APIView):
-    def get(self, *args, **kwargs):
-        lectures = self._filter()
+    def get(self, request, *args, **kwargs):
+        paginator = PageNumberPagination()
+        lectures = paginator.paginate_queryset(self._filter(), request)
         serializer = LectureSerializer(lectures, many=True)
-        return Response(serializer.data)
+        return paginator.get_paginated_response(serializer.data)
 
     def _filter(self):
         queryset = Lecture.objects.all()
         if department_code := self.request.query_params.get("department"):
             queryset = queryset.filter(professor__department__code=department_code)
+        
         return queryset
 
 
@@ -46,5 +51,54 @@ class LectureRegisterView(APIView):
 
         student.total_credit += lecture.credit
         student.save()
+
+        return Response({"message": "수강 신청에 성공했습니다."}, status=204)
+
+
+class RandomLectureRegisterView(APIView):
+    def post(self, *args, **kwargs):
+        students = list(Person.objects.all())
+        lectures = list(Lecture.objects.all())
+
+        random.shuffle(lectures)
+
+        lecture_capacity = {lecture.id: lecture.register_limit for lecture in lectures}
+
+        with transaction.atomic():
+            for student in students:
+                num_lectures = random.randint(4, 8)
+
+                available_lectures = [lecture for lecture in lectures if lecture_capacity[lecture.id] > 0]
+
+                if not available_lectures:
+                    continue
+
+                selected_lectures = random.sample(available_lectures, min(num_lectures, len(available_lectures)))
+
+                for lecture in selected_lectures:
+                    lecture.students.add(student)
+                    lecture_capacity[lecture.id] -= 1
+                    student.total_credit += 3
+
+                student.save()
+
+                for lecture in selected_lectures:
+                    lecture.save()
+
+        return Response({"message": "수강 신청에 성공했습니다."}, status=204)
+
+
+class DeleteLectureView(APIView):
+    def delete(self, request, lecture_id):
+        with transaction.atomic():
+            lecture = Lecture.objects.get(id=lecture_id)
+
+            students = lecture.students.all()
+            for student in students:
+                student.total_credit -= lecture.credit
+                student.lecture_set.clear()
+                student.save()
+
+            lecture.delete()
 
         return Response({"message": "수강 신청에 성공했습니다."}, status=204)
