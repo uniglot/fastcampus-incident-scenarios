@@ -1,0 +1,29 @@
+global:
+  redis:
+    password: supersecretpassword
+
+master:
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 300m
+    limits:
+      memory: 256Mi
+      cpu: 600m
+  persistence:
+    enabled: false
+
+replica:
+  replicaCount: 1
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 100m
+    limits:
+      memory: 256Mi
+      cpu: 200m
+  persistence:
+    enabled: false
+
+sentinel:
+  enabled: false
