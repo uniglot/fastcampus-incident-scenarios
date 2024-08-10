@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "chart.fullname" . }}
+  name: {{ include "chart.fullname" . }}-deployment
   labels:
     {{- include "chart.labels" . | nindent 4 }}
 spec:
@@ -28,7 +28,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "chart.serviceAccountName" . }}
+      serviceAccountName: {{ include "chart.serviceAccountName" . }}-sa
       securityContext:
         {{- toYaml .Values.workload.podSecurityContext | nindent 8 }}
       containers:
@@ -47,6 +47,7 @@ spec:
             - name: http
               containerPort: {{ .Values.workload.containerPort }}
               protocol: TCP
+          {{- if .Values.workload.probes.enabled }}
           livenessProbe:
             httpGet:
               path: {{ .Values.workload.probes.livenessProbe.path }}
@@ -61,12 +62,12 @@ spec:
             {{- if .Values.workload.probes.readinessProbe.conditions }}
             {{- toYaml .Values.workload.probes.readinessProbe.conditions | nindent 12 }}
             {{- end }}
+          {{- end }}
           resources:
             {{- toYaml .Values.workload.resources | nindent 12 }}
-          {{- if .Values.workload.envFrom }}
-          envFrom:
-            {{- toYaml .Values.workload.envFrom | nindent 12 }}
-          {{- end }}
+          env:
+            - name: SCRIPT_NAME
+              value: {{ .Values.workload.scriptName }}
       {{- with .Values.workload.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

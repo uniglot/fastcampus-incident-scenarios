@@ -27,6 +27,7 @@ workload:
   podSecurityContext: {}
   securityContext: {}
   probes:
+    enabled: true
     livenessProbe:
       path: /
       conditions: {}
@@ -34,14 +35,10 @@ workload:
       path: /
       conditions: {}
   resources: {}
-  envFrom: []
+  scriptName: ""
   nodeSelector: {}
   tolerations: []
   affinity: {}
-
-secret:
-  name: ""
-  body: {}
 
 service:
   type: ClusterIP
@@ -54,6 +51,7 @@ service:
 ingress:
   enabled: false
   className: ""
+  scheme: internet-facing
   annotations: {}
   hosts:
     - host: ""

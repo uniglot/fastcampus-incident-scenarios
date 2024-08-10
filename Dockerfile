@@ -1,13 +1,12 @@
 # Base
 
-FROM python:3.12-slim-bookworm as base
+FROM python:3.11-slim-bookworm as base
 
 ENV PYTHONBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
 RUN apt-get update && apt-get install -y \
     build-essential \
-    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -29,11 +28,10 @@ RUN pip install poetry==$POETRY_VERSION \
 
 FROM base as runner
 
+ENV SCRIPT_NAME="consumer.py"
+
 COPY --from=builder /usr/local/bin /usr/local/bin
-COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY ./application /app
 
-ARG DJANGO_SETTINGS
-ENV DJANGO_SETTINGS=$DJANGO_SETTINGS
-
-CMD [ "/bin/bash", "-c", "python manage.py migrate && gunicorn config.wsgi:application --bind 0.0.0.0:8000"]
+CMD [ "/bin/bash", "-c", "python ${SCRIPT_NAME}"]

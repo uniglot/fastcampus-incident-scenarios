@@ -1,0 +1,39 @@
+common:
+  nameOverride: fastcampus-consumer
+  fullnameOverride: fastcampus-consumer
+
+serviceAccount:
+  create: true
+
+workload:
+  kind: Deployment
+  replicaCount: 1
+  image:
+    ecr:
+      enabled: true
+      repository: fastcampus-app-image
+  resources:
+    requests:
+      cpu: 300m
+      memory: 256Mi
+    limits:
+      cpu: 600m
+      memory: 512Mi
+  containerPort: 5000
+  scriptName: consumer.py
+  probes:
+    enabled: false
+
+autoscaling:
+  enabled: false
+
+service:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 5000
+      protocol: TCP
+      name: http
+
+ingress:
+  enabled: false

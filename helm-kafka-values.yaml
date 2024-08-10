@@ -1,0 +1,8 @@
+controller:
+  replicaCount: 1
+  persistence:
+    size: 1Gi
+
+listeners:
+  client:
+    protocol: PLAINTEXT
