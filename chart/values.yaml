@@ -34,14 +34,11 @@ workload:
       path: /
       conditions: {}
   resources: {}
-  envFrom: []
+  databaseHost: ""
+  deployStage: ""
   nodeSelector: {}
   tolerations: []
   affinity: {}
-
-secret:
-  name: ""
-  body: {}
 
 service:
   type: ClusterIP
@@ -54,6 +51,7 @@ service:
 ingress:
   enabled: false
   className: ""
+  scheme: internet-facing
   annotations: {}
   hosts:
     - host: ""

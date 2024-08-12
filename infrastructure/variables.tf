@@ -7,8 +7,3 @@ variable "aws_secret_key" {
   description = "AWS SECRET KEY"
   type        = string
 }
-
-variable "rds_password" {
-  description = "RDS PASSWORD"
-  type        = string
-}

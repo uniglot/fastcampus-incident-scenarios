@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "chart.fullname" . }}
+  name: {{ include "chart.fullname" . }}-deployment
   labels:
     {{- include "chart.labels" . | nindent 4 }}
 spec:
@@ -28,7 +28,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "chart.serviceAccountName" . }}
+      serviceAccountName: {{ include "chart.serviceAccountName" . }}-sa
       securityContext:
         {{- toYaml .Values.workload.podSecurityContext | nindent 8 }}
       containers:
@@ -63,10 +63,11 @@ spec:
             {{- end }}
           resources:
             {{- toYaml .Values.workload.resources | nindent 12 }}
-          {{- if .Values.workload.envFrom }}
-          envFrom:
-            {{- toYaml .Values.workload.envFrom | nindent 12 }}
-          {{- end }}
+          env:
+            - name: DATABASE_HOST
+              value: "{{ .Values.workload.databaseHost }}"
+            - name: DJANGO_SETTINGS
+              value: {{ .Values.workload.deployStage }}
       {{- with .Values.workload.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
