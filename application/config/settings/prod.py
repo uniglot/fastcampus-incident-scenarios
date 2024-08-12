@@ -10,7 +10,7 @@ DATABASES = {
         "PASSWORD": "supersecretpassword",
         "HOST": os.environ.get("DATABASE_HOST"),
         "PORT": "3306",
-        "CONN_MAX_AGE": 0,
+        "CONN_MAX_AGE": 300,
     }
 }
 

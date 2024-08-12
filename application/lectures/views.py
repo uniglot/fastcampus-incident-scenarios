@@ -28,20 +28,20 @@ class LectureView(APIView):
 class LectureDetailView(APIView):
     def get(self, request, *args, **kwargs):
         cache_key = f"lecture:{kwargs['lecture_id']}"
-        # try:
-        lecture_data = cache.get(cache_key)
+        try:
+            lecture_data = cache.get(cache_key)
 
-        if not lecture_data:
+            if not lecture_data:
+                lecture_data = self.get_lecture_data(kwargs["lecture_id"])
+                if lecture_data:
+                    cache.set(cache_key, lecture_data, timeout=2)
+                else:
+                    return Response({"message": "존재하지 않는 강의입니다."}, status=400)
+
+            return Response(lecture_data, status=200)
+        except Exception:
             lecture_data = self.get_lecture_data(kwargs["lecture_id"])
-            if lecture_data:
-                cache.set(cache_key, lecture_data, timeout=2)
-            else:
-                return Response({"message": "존재하지 않는 강의입니다."}, status=400)
-
-        return Response(lecture_data, status=200)
-        # except Exception:
-        #     lecture_data = self.get_lecture_data(kwargs["lecture_id"])
-        #     return Response(lecture_data, status=200)
+            return Response(lecture_data, status=200)
 
     def get_lecture_data(self, lecture_id):
         try:
